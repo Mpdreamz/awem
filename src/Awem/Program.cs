@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using WindowsDesktop;
 
 namespace Awem
 {
@@ -10,10 +7,10 @@ namespace Awem
 		static void Main(string[] args)
 		{
 			var applicationWindows = ApplicationWindows.VisibleOnCurrentDesktop();
-
-			foreach (var window in applicationWindows)
+			using (new WindowForegroundChangedNotifier(i => Console.WriteLine("Foregound: {0}", i)))
+			using (new DesktopSwitchNotifier(i => Console.WriteLine("Desktop {0}", i)))
 			{
-				Console.WriteLine($"-> {window.Desktop.Id}\t ({window.ClassName}) {window.WindowTitle}");
+				EventLoop.Run();
 			}
 		}
 	}

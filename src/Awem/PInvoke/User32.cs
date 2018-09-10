@@ -37,5 +37,6 @@ namespace Awem.PInvoke
 
 		[DllImport("user32.dll", ExactSpelling = true)]
 		public static extern IntPtr GetAncestor(IntPtr hwnd, GetAncestorFlags flags);
+		
 	}
 }
