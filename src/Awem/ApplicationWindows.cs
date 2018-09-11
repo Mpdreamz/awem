@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using WindowsDesktop;
 using Awem.PInvoke;
 
@@ -23,13 +24,16 @@ namespace Awem
 			where window.Desktop == VirtualDesktop.Current
 			select window;
 
+		[DllImport("user32.dll", SetLastError = true)]
+		private static extern IntPtr FindWindowEx(IntPtr parentHandle, IntPtr childAfter, string className, string windowTitle);
+
 		private static IEnumerable<IntPtr> EnumerateAllTopLevelWindows()
 		{
 			var parentHandle = IntPtr.Zero;
 			var childAfter = IntPtr.Zero;
 			for (var i = 0; i < 10_000; i++)
 			{
-				childAfter = User32.FindWindowEx(parentHandle, childAfter, null, null);
+				childAfter = FindWindowEx(parentHandle, childAfter, null, null);
 				if (childAfter == IntPtr.Zero) yield break;
 				yield return childAfter;
 			}

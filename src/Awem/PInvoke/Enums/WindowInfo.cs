@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace Awem
 {
-	public struct WindowInfo
+	internal struct WindowInfo
 	{
 		public uint cbSize;
 		public Rect rcWindow;
@@ -20,20 +20,16 @@ namespace Awem
 		public ushort atomWindowType;
 		public ushort wCreatorVersion;
 
-		public WindowInfo(Boolean? filler) : this()
-		{
-			cbSize = (uint) (Marshal.SizeOf(typeof(WindowInfo)));
-		}
+		public WindowInfo(bool? filler) : this() => cbSize = (uint) (Marshal.SizeOf(typeof(WindowInfo)));
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
-	public struct Rect
+	internal struct Rect
 	{
 		public readonly int Left; // x position of upper-left corner
 		public readonly int Top; // y position of upper-left corner
 		public readonly int Right; // x position of lower-right corner
 		public readonly int Bottom; // y position of lower-right corner
-
 
 		public int Height => Bottom - Top;
 		public int Width => Right - Left;

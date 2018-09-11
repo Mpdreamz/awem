@@ -1,6 +1,6 @@
 namespace Awem.PInvoke.Enums
 {
-	public enum GetAncestorFlags
+	internal enum GetAncestorFlags
 	{
 		GetParent = 1,
 		GetRoot = 2,

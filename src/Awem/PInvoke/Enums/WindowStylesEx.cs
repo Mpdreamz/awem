@@ -5,7 +5,7 @@ using System;
 namespace Awem
 {
 	[Flags]
-	public enum WindowStylesEx : uint
+	internal enum WindowStylesEx : uint
 	{
 		/// <summary>
 		/// Specifies that a window created with this style accepts drag-drop files.
@@ -20,7 +20,7 @@ namespace Awem
 		/// </summary>
 		WS_EX_CLIENTEDGE = 0x00000200,
 		/// <summary>
-		/// Windows XP: Paints all descendants of a window in bottom-to-top painting order using double-buffering. For more information, see Remarks. This cannot be used if the window has a class style of either CS_OWNDC or CS_CLASSDC. 
+		/// Windows XP: Paints all descendants of a window in bottom-to-top painting order using double-buffering. For more information, see Remarks. This cannot be used if the window has a class style of either CS_OWNDC or CS_CLASSDC.
 		/// </summary>
 		WS_EX_COMPOSITED = 0x02000000,
 		/// <summary>
@@ -37,11 +37,11 @@ namespace Awem
 		/// </summary>
 		WS_EX_DLGMODALFRAME = 0x00000001,
 		/// <summary>
-		/// Windows 2000/XP: Creates a layered window. Note that this cannot be used for child windows. Also, this cannot be used if the window has a class style of either CS_OWNDC or CS_CLASSDC. 
+		/// Windows 2000/XP: Creates a layered window. Note that this cannot be used for child windows. Also, this cannot be used if the window has a class style of either CS_OWNDC or CS_CLASSDC.
 		/// </summary>
 		WS_EX_LAYERED = 0x00080000,
 		/// <summary>
-		/// Arabic and Hebrew versions of Windows 98/Me, Windows 2000/XP: Creates a window whose horizontal origin is on the right edge. Increasing horizontal values advance to the left. 
+		/// Arabic and Hebrew versions of Windows 98/Me, Windows 2000/XP: Creates a window whose horizontal origin is on the right edge. Increasing horizontal values advance to the left.
 		/// </summary>
 		WS_EX_LAYOUTRTL = 0x00400000,
 		/// <summary>
@@ -61,7 +61,7 @@ namespace Awem
 		/// </summary>
 		WS_EX_MDICHILD = 0x00000040,
 		/// <summary>
-		/// Windows 2000/XP: A top-level window created with this style does not become the foreground window when the user clicks it. The system does not bring this window to the foreground when the user minimizes or closes the foreground window. 
+		/// Windows 2000/XP: A top-level window created with this style does not become the foreground window when the user clicks it. The system does not bring this window to the foreground when the user minimizes or closes the foreground window.
 		/// To activate the window, use the SetActiveWindow or SetForegroundWindow function.
 		/// The window does not appear on the taskbar by default. To force the window to appear on the taskbar, use the WS_EX_APPWINDOW style.
 		/// </summary>
@@ -100,7 +100,7 @@ namespace Awem
 		/// </summary>
 		WS_EX_STATICEDGE = 0x00020000,
 		/// <summary>
-		/// Creates a tool window; that is, a window intended to be used as a floating toolbar. A tool window has a title bar that is shorter than a normal title bar, and the window title is drawn using a smaller font. A tool window does not appear in the taskbar or in the dialog that appears when the user presses ALT+TAB. If a tool window has a system menu, its icon is not displayed on the title bar. However, you can display the system menu by right-clicking or by typing ALT+SPACE. 
+		/// Creates a tool window; that is, a window intended to be used as a floating toolbar. A tool window has a title bar that is shorter than a normal title bar, and the window title is drawn using a smaller font. A tool window does not appear in the taskbar or in the dialog that appears when the user presses ALT+TAB. If a tool window has a system menu, its icon is not displayed on the title bar. However, you can display the system menu by right-clicking or by typing ALT+SPACE.
 		/// </summary>
 		WS_EX_TOOLWINDOW = 0x00000080,
 		/// <summary>

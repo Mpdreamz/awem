@@ -3,7 +3,7 @@
 
 namespace Awem
 {
-	enum DwmWindowAttribute : uint
+	internal enum DwmWindowAttribute : uint
 	{
 		NCRenderingEnabled = 1,
 		NCRenderingPolicy,
