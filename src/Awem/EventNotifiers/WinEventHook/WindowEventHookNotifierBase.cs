@@ -33,7 +33,7 @@ namespace Awem
 			if (this._windowEventHook == IntPtr.Zero)
 				throw new Exception(Marshal.GetLastWin32Error().ToString());
 		}
-		public void Dispose()
+		public virtual void Dispose()
 		{
 			if (this._windowEventHook == IntPtr.Zero) return;
 			UnhookWinEvent(this._windowEventHook);

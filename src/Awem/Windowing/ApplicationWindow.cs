@@ -3,14 +3,13 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 using WindowsDesktop;
-using Awem.PInvoke;
 using Awem.PInvoke.Enums;
 
-namespace Awem
+namespace Awem.Windowing
 {
 	public struct ApplicationWindow
 	{
-		public IntPtr WindowHandler { get; }
+		private IntPtr WindowHandler { get; }
 
 		public ApplicationWindow(IntPtr hWnd) => this.WindowHandler = hWnd;
 

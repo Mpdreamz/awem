@@ -1,7 +1,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable file InconsistentNaming
 
-namespace Awem
+namespace Awem.PInvoke.Enums
 {
 	internal enum DwmWindowAttribute : uint
 	{

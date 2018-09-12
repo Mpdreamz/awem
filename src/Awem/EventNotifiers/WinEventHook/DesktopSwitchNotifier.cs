@@ -1,24 +1,32 @@
 ﻿using System;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using WindowsDesktop;
 
 namespace Awem
 {
 	public class DesktopSwitchNotifier : WindowEventHookNotifierBase
 	{
-		private readonly Action<IntPtr> _changedHandler;
+		private const int EVENT_SYSTEM_DESKTOPSWITCH = 0x0020;
 
-		public DesktopSwitchNotifier(Action<IntPtr> changedHandler)
+		public DesktopSwitchNotifier()
 		{
-			_changedHandler = changedHandler ?? (i => { });
 			this.CreateWinEventHook(EVENT_SYSTEM_DESKTOPSWITCH, this.WindowEventCallback);
-			VirtualDesktop.CurrentChanged += (sender, args) => _changedHandler(new IntPtr(1));
+			VirtualDesktop.CurrentChanged += this.OnChanged;
 		}
+
+		private readonly Subject<IntPtr> _changed = new Subject<IntPtr>();
+		public IObservable<IntPtr> Changed => _changed.AsObservable();
+		private void OnChanged(object sender, EventArgs e) => this._changed.OnNext(new IntPtr(1));
 
 		private void WindowEventCallback(
 			IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
-			=> _changedHandler(hwnd);
+			=> this._changed.OnNext(hwnd);
 
-		private const int EVENT_SYSTEM_DESKTOPSWITCH = 0x0020;
-
+		public override void Dispose()
+		{
+			VirtualDesktop.CurrentChanged -= this.OnChanged;
+			base.Dispose();
+		}
 	}
 }

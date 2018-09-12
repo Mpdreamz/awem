@@ -1,11 +1,10 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable file InconsistentNaming
 
-using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace Awem
+namespace Awem.PInvoke.Enums
 {
 	internal struct WindowInfo
 	{
@@ -33,7 +32,7 @@ namespace Awem
 
 		public int Height => Bottom - Top;
 		public int Width => Right - Left;
-		public Size Size => new Size(Width, Height);
+		public Size Size => new Size(this.Width, this.Height);
 		public Rectangle Rectangle => new Rectangle(this.Left, this.Top, this.Width, this.Height);
 
 		public Rect(int left, int top, int right, int bottom)

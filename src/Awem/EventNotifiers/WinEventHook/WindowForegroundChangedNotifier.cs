@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using Microsoft.Win32;
 
 namespace Awem
 {
@@ -8,19 +11,15 @@ namespace Awem
 
 	public class WindowForegroundChangedNotifier : WindowEventHookNotifierBase
 	{
-		private readonly Action<IntPtr> _changedHandler;
+		private const int EVENT_SYSTEM_FOREGROUND = 3;
 
-		public WindowForegroundChangedNotifier(Action<IntPtr> changedHandler)
-		{
-			_changedHandler = changedHandler ?? (i => { });
-			this.CreateWinEventHook(EVENT_SYSTEM_FOREGROUND, this.WindowEventCallback);
-		}
+		public WindowForegroundChangedNotifier() => this.CreateWinEventHook(EVENT_SYSTEM_FOREGROUND, this.WindowEventCallback);
+
+		private readonly Subject<IntPtr> _changed = new Subject<IntPtr>();
+		public IObservable<IntPtr> Changed => _changed.AsObservable();
 
 		private void WindowEventCallback(
 			IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
-			=> _changedHandler(hwnd);
-
-		private const int EVENT_SYSTEM_FOREGROUND = 3;
-
+			=> this._changed.OnNext(hwnd);
 	}
 }

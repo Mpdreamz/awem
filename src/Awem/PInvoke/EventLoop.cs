@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Awem
+namespace Awem.PInvoke
 {
 	public static class EventLoop
 	{

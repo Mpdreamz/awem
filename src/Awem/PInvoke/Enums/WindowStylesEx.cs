@@ -1,8 +1,9 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable file InconsistentNaming
+
 using System;
 
-namespace Awem
+namespace Awem.PInvoke.Enums
 {
 	[Flags]
 	internal enum WindowStylesEx : uint

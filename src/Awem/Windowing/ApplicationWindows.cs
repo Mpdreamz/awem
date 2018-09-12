@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using WindowsDesktop;
-using Awem.PInvoke;
 
-namespace Awem
+namespace Awem.Windowing
 {
 	public static class ApplicationWindows
 	{
@@ -27,13 +26,13 @@ namespace Awem
 		[DllImport("user32.dll", SetLastError = true)]
 		private static extern IntPtr FindWindowEx(IntPtr parentHandle, IntPtr childAfter, string className, string windowTitle);
 
-		private static IEnumerable<IntPtr> EnumerateAllTopLevelWindows()
+		public static IEnumerable<IntPtr> EnumerateAllTopLevelWindows(string className = null)
 		{
 			var parentHandle = IntPtr.Zero;
 			var childAfter = IntPtr.Zero;
 			for (var i = 0; i < 10_000; i++)
 			{
-				childAfter = FindWindowEx(parentHandle, childAfter, null, null);
+				childAfter = FindWindowEx(parentHandle, childAfter, className, null);
 				if (childAfter == IntPtr.Zero) yield break;
 				yield return childAfter;
 			}
