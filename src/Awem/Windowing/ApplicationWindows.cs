@@ -17,10 +17,11 @@ namespace Awem.Windowing
 			where window.Desktop != null
 			select window;
 
-		public static IEnumerable<ApplicationWindow> VisibleOnCurrentDesktop() =>
+		public static IEnumerable<ApplicationWindow> VisibleOnCurrentDesktop() => VisibleOnDesktop(VirtualDesktop.Current);
+		public static IEnumerable<ApplicationWindow> VisibleOnDesktop(VirtualDesktop desktop) =>
 			from window in All()
 			where !window.IsWindows10CloakingWindow
-			where window.Desktop == VirtualDesktop.Current
+			where window.Desktop == desktop
 			select window;
 
 		[DllImport("user32.dll", SetLastError = true)]

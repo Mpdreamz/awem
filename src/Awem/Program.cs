@@ -1,4 +1,6 @@
-﻿using Awem.PInvoke;
+﻿using System;
+using WindowsDesktop;
+using Awem.PInvoke;
 
 namespace Awem
 {
@@ -8,8 +10,10 @@ namespace Awem
 		{
 			using(var wm = new WindowManager())
 			{
+				Console.WriteLine($"{VirtualDesktop.GetDesktops().Length} Desktops");
 				EventLoop.Run();
 			}
+			Console.WriteLine($"{VirtualDesktop.GetDesktops().Length} Desktops");
 			return 0;
 		}
 	}

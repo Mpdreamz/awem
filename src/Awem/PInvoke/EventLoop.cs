@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Awem.PInvoke
@@ -9,7 +10,11 @@ namespace Awem.PInvoke
 		{
 			while (true)
 			{
-				if (!PeekMessage(out var msg, IntPtr.Zero, 0, 0, PM_REMOVE)) continue;
+				if (!PeekMessage(out var msg, IntPtr.Zero, 0, 0, PM_REMOVE))
+				{
+					if (BreakRequested) break;
+					continue;
+				}
 				var m = msg.Message;
 				if (m == WM_QUIT) break;
 				if (m == WM_DISPLAYCHANGE)
@@ -26,6 +31,7 @@ namespace Awem.PInvoke
 
 				TranslateMessage(ref msg);
 				DispatchMessage(ref msg);
+				if (BreakRequested) break;
 			}
 		}
 
@@ -55,5 +61,8 @@ namespace Awem.PInvoke
 		private static extern bool TranslateMessage(ref Msg lpMsg);
 		[DllImport("user32.dll")]
 		private static extern IntPtr DispatchMessage(ref Msg lpMsg);
+
+		private static bool BreakRequested = false;
+		public static void Break() => BreakRequested = true;
 	}
 }

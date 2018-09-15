@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using WindowsDesktop;
 using Awem.EventNotifiers;
 using Awem.Windowing;
 using ReactiveUI;
@@ -15,6 +16,10 @@ namespace Awem
 		private WindowForegroundChangedNotifier WindowForegroundChangedNotifier { get; }
 		private DesktopSwitchNotifier DesktopSwitchNotifier { get; }
 
+		private KeyboardHooks KeyboardHooks { get; }
+		private DesktopManager DesktopManager { get; }
+		private DesktopWindowManager DesktopWindowManager { get; }
+
 		public ICollection<MonitorScreen> Monitors => MonitorScreens.All();
 		public ICollection<ApplicationWindow> AllApplications => ApplicationWindows.All().ToList();
 		public ICollection<ApplicationWindow> CurrentDesktopApplications => ApplicationWindows.VisibleOnCurrentDesktop().ToList();
@@ -25,6 +30,8 @@ namespace Awem
 			this.DisplaySettingsChangedNotifier = new DisplaySettingsChangedNotifier();
 			this.WindowForegroundChangedNotifier = new WindowForegroundChangedNotifier();
 			this.DesktopSwitchNotifier = new DesktopSwitchNotifier();
+			this.DesktopManager = new DesktopManager();
+			this.KeyboardHooks = new KeyboardHooks(this.DesktopManager);
 			var displayChanged = this.WhenAnyObservable(
 				w => w.UserPreferenceChangedNotifier.Changed,
 				w => w.DisplaySettingsChangedNotifier.Changed
@@ -33,8 +40,13 @@ namespace Awem
 				w => w.WindowForegroundChangedNotifier.Changed,
 				w => w.DesktopSwitchNotifier.Changed
 			);
-			windowsChanged.Select(i => (object) i).Merge<object>(displayChanged)
-				.Subscribe(i => MonitorScreens.EnumerateScreens());
+			var desktopChange = this.WhenAnyValue(
+				vm => vm.DesktopManager.PreviousDesktop,
+				vm => vm.DesktopManager.CurrentDesktop
+			);
+			this.DesktopWindowManager = new DesktopWindowManager(desktopChange);
+//			windowsChanged.Select(i => (object) i).Merge(displayChanged)
+//				.Subscribe(i => MonitorScreens.EnumerateScreens());
 		}
 
 		private void Refresh() => MonitorScreens.Refresh();
@@ -45,7 +57,27 @@ namespace Awem
 			this.DisplaySettingsChangedNotifier.Dispose();
 			this.WindowForegroundChangedNotifier.Dispose();
 			this.DesktopSwitchNotifier.Dispose();
+			this.KeyboardHooks.Dispose();
+			this.DesktopManager.Dispose();
 		}
+	}
 
+	public class DesktopWindowManager
+	{
+		public DesktopWindowManager(IObservable<Tuple<int, int>> desktopChange)
+		{
+			desktopChange.Subscribe((d) =>
+			{
+				var previous = VirtualDesktop.GetDesktops()[d.Item1];
+				var oldWindows = ApplicationWindows.VisibleOnDesktop(previous);
+				foreach(var oldWindow in oldWindows)
+					oldWindow.KillFocus();
+
+				var windows = ApplicationWindows.VisibleOnCurrentDesktop().ToList();
+				var window = windows.FirstOrDefault();
+				window?.Activate();
+			});
+
+		}
 	}
 }
