@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using WindowsDesktop;
@@ -9,7 +10,7 @@ namespace Awem.Windowing
 {
 	public class ApplicationWindow
 	{
-		private IntPtr WindowHandler { get; }
+		public IntPtr WindowHandler { get; }
 
 		public ApplicationWindow(IntPtr hWnd) => this.WindowHandler = hWnd;
 
@@ -29,7 +30,7 @@ namespace Awem.Windowing
 		public IntPtr LastVisiblePopUpRoot => GetLastVisibleActivePopUpOfWindow(this.Ancestor);
 		public Rectangle WindowPlacement => GetWindowInfoFromHwnd(this.WindowHandler).rcWindow.Rectangle;
 		public VirtualDesktop Desktop => VirtualDesktop.FromHwnd(this.WindowHandler);
-
+		public bool IsActive => this.WindowHandler == GetForegroundWindow();
 
 		private bool HasSufficientScreenRealEstate()
 		{
@@ -162,10 +163,10 @@ namespace Awem.Windowing
 			// We (hopefully) get around doing this by activating the first window explicitly on each desktop switch.
 
 			var pressed = false;
-			if ((GetAsyncKeyState(VK_MENU) & 0x8000) == 0)
+			if (!KeyboardStateManager.MenuKeyIsDown)
 			{
 				pressed = true;
-				keybd_event(VK_MENU, 0, KEYEVENTF_EXTENDEDKEY | 0, 0);
+				KeyboardStateManager.SimulateKeyDown(VirtualKeys.Menu);
 			}
 
 			SetForegroundWindow(this.WindowHandler);
@@ -174,7 +175,7 @@ namespace Awem.Windowing
 
 
 			if (pressed) {
-				keybd_event(VK_MENU, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+				KeyboardStateManager.SimulateKeyUp(VirtualKeys.Menu);
 			}
 
 			return;

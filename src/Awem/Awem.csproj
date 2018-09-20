@@ -2,14 +2,17 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <TargetFramework>net47</TargetFramework>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="VirtualDesktop.Standard" Version="1.0.1" />
+      <!--<PackageReference Include="VirtualDesktop" Version="3.0.0-beta1" />-->
       <PackageReference Include="Microsoft.Win32.SystemEvents" Version="4.5.0" />
       <PackageReference Include="System.Drawing.Common" Version="4.5.0" />
       <PackageReference Include="reactiveui" Version="8.7.2" />
+      <ProjectReference Include="..\..\..\VirtualDesktop\source\VirtualDesktop\VirtualDesktop.csproj" />
+
     </ItemGroup>
 
 </Project>

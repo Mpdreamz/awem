@@ -18,7 +18,7 @@ namespace Awem
 
 		private KeyboardHooks KeyboardHooks { get; }
 		private DesktopManager DesktopManager { get; }
-		private DesktopWindowManager DesktopWindowManager { get; }
+		private LayoutManager LayoutManager { get; }
 
 		public ICollection<MonitorScreen> Monitors => MonitorScreens.All();
 		public ICollection<ApplicationWindow> AllApplications => ApplicationWindows.All().ToList();
@@ -44,7 +44,7 @@ namespace Awem
 				vm => vm.DesktopManager.PreviousDesktop,
 				vm => vm.DesktopManager.CurrentDesktop
 			);
-			this.DesktopWindowManager = new DesktopWindowManager(desktopChange);
+			this.LayoutManager = new LayoutManager(desktopChange);
 //			windowsChanged.Select(i => (object) i).Merge(displayChanged)
 //				.Subscribe(i => MonitorScreens.EnumerateScreens());
 		}
@@ -62,16 +62,16 @@ namespace Awem
 		}
 	}
 
-	public class DesktopWindowManager
+	public class LayoutManager
 	{
-		public DesktopWindowManager(IObservable<Tuple<int, int>> desktopChange)
+		public LayoutManager(IObservable<Tuple<int, int>> desktopChange)
 		{
-			desktopChange.Subscribe((d) =>
+			desktopChange.Subscribe(d =>
 			{
 				var previous = VirtualDesktop.GetDesktops()[d.Item1];
-				var oldWindows = ApplicationWindows.VisibleOnDesktop(previous);
-				foreach(var oldWindow in oldWindows)
-					oldWindow.KillFocus();
+//				var oldWindows = ApplicationWindows.VisibleOnDesktop(previous);
+//				foreach(var oldWindow in oldWindows)
+//					oldWindow.KillFocus();
 
 				var windows = ApplicationWindows.VisibleOnCurrentDesktop().ToList();
 				var window = windows.FirstOrDefault();

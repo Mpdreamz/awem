@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using WindowsDesktop;
+using Awem.PInvoke.Enums;
+using Awem.Windowing;
 using ReactiveUI;
 
 namespace Awem
@@ -27,6 +29,14 @@ namespace Awem
 		public int CountAtStart { get; }
 
 		public void GotoPreviousDesktop() => this.GotoDesktop(this.PreviousDesktop);
+
+		public void MoveToDesktop(int desktop, ApplicationWindow window)
+		{
+			if (window == null) return;
+			var desktops = VirtualDesktop.GetDesktops();
+			if (desktop >= 0 && desktop < desktops.Length)
+				VirtualDesktopHelper.MoveToDesktop(window.WindowHandler,desktops[desktop]);
+		}
 
 		public void GotoDesktop(int desktop)
 		{

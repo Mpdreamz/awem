@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Awem", "Awem\Awem.csproj", "{D4BCD5F7-E218-4C46-9C1D-14469B18CD7D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualDesktop", "..\..\VirtualDesktop\source\VirtualDesktop\VirtualDesktop.csproj", "{AB848ECD-76AA-41C0-B63D-86A8591B25AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{D4BCD5F7-E218-4C46-9C1D-14469B18CD7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4BCD5F7-E218-4C46-9C1D-14469B18CD7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4BCD5F7-E218-4C46-9C1D-14469B18CD7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB848ECD-76AA-41C0-B63D-86A8591B25AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB848ECD-76AA-41C0-B63D-86A8591B25AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB848ECD-76AA-41C0-B63D-86A8591B25AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB848ECD-76AA-41C0-B63D-86A8591B25AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

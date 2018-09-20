@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using WindowsDesktop;
 
@@ -23,6 +24,8 @@ namespace Awem.Windowing
 			where !window.IsWindows10CloakingWindow
 			where window.Desktop == desktop
 			select window;
+
+		public static ApplicationWindow Current => VisibleOnCurrentDesktop().FirstOrDefault(w => w.IsActive);
 
 		[DllImport("user32.dll", SetLastError = true)]
 		private static extern IntPtr FindWindowEx(IntPtr parentHandle, IntPtr childAfter, string className, string windowTitle);
