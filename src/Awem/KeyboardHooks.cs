@@ -3,69 +3,135 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
+using System.Text.RegularExpressions;
 using Awem.PInvoke;
 using Awem.PInvoke.Enums;
-using Awem.Windowing;
+using ReactiveUI;
 
 namespace Awem
 {
-	public class KeyboardStateManager
+
+	public class KeyboardCombinationParser
 	{
-		[DllImport("user32.dll")]
-		private static extern short GetAsyncKeyState(ushort vKey);
+		private readonly WindowManagerActions _windowManagerActions;
 
-		[DllImport("user32.dll")]
-		private static extern short GetKeyState(ushort vKey);
+		public KeyboardCombinationParser(WindowManagerActions windowManagerActions) => _windowManagerActions = windowManagerActions;
 
-		private const int KEYEVENTF_EXTENDEDKEY = 0x0001;
-		private const int KEYEVENTF_KEYUP = 0x0002;
-
-		[DllImport("user32.dll")]
-		private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, int dwExtraInfo);
-
-		public static bool KeyIsDown(VirtualKeys key)
+		private readonly string[] DefaultShortcuts = new[]
 		{
-			//expand shift, menu, and control to include explicit left and right states
-			switch (key)
-			{
-				case VirtualKeys.Shift:
-					return (GetKeyState((ushort)key) & 0x8000) != 0
-					       || KeyIsDown(VirtualKeys.LeftShift)
-					       || KeyIsDown(VirtualKeys.RightShift);
+			$"{nameof(WindowManagerActions.GotoDesktop)}0=N1",
+			$"{nameof(WindowManagerActions.GotoDesktop)}1=2",
+			$"{nameof(WindowManagerActions.GotoDesktop)}2=N3",
+			$"{nameof(WindowManagerActions.GotoDesktop)}3=4",
+			$"{nameof(WindowManagerActions.GotoDesktop)}4=N5",
+			$"{nameof(WindowManagerActions.GotoDesktop)}5=N6",
+			$"{nameof(WindowManagerActions.GotoDesktop)}6=N7",
+			$"{nameof(WindowManagerActions.GotoDesktop)}7=N8",
+			$"{nameof(WindowManagerActions.GotoDesktop)}8=N9",
+			$"{nameof(WindowManagerActions.GotoDesktop)}9=N10",
+			$"{nameof(WindowManagerActions.GotoDesktop)}0=N11",
+			$"{nameof(WindowManagerActions.MoveToDesktop)}0=Shift+N1",
+			$"{nameof(WindowManagerActions.MoveToDesktop)}1=Shift+2",
+			$"{nameof(WindowManagerActions.MoveToDesktop)}2=Shift+N3",
+			$"{nameof(WindowManagerActions.MoveToDesktop)}3=Shift+4",
+			$"{nameof(WindowManagerActions.MoveToDesktop)}4=Shift+N5",
+			$"{nameof(WindowManagerActions.MoveToDesktop)}5=Shift+6",
+			$"{nameof(WindowManagerActions.MoveToDesktop)}6=Shift+7",
+			$"{nameof(WindowManagerActions.MoveToDesktop)}7=Shift+8",
+			$"{nameof(WindowManagerActions.MoveToDesktop)}8=Shift+9",
+			$"{nameof(WindowManagerActions.MoveToDesktop)}9=Shift+10",
+			$"{nameof(WindowManagerActions.MoveToDesktop)}0=Shift+11",
+			$"{nameof(WindowManagerActions.Die)}=X",
+			$"{nameof(WindowManagerActions.GotoPreviousDesktop)}=Back",
+		};
 
-				case VirtualKeys.Control:
-					return (GetKeyState((ushort)key) & 0x8000) != 0
-					       || KeyIsDown(VirtualKeys.LeftControl)
-					       || KeyIsDown(VirtualKeys.RightControl);
-				case VirtualKeys.Menu:
-					return (GetKeyState((ushort)key) & 0x8000) != 0
-					       || KeyIsDown(VirtualKeys.LeftMenu)
-					       || KeyIsDown(VirtualKeys.RightMenu);
 
-				default: return (GetKeyState((ushort)key) & 0x8000) != 0;
-			}
+		public KeyboardCombination[] ToKeyboardCombinations(IEnumerable<string> config = null)
+		{
+			var c = DefaultShortcuts.Union(config ?? Enumerable.Empty<string>());
+			return c.Select(this.Parse).Where(p=>p.Shortcut != null).OrderByDescending(p=>p.Shortcut.Count).ToArray();
 		}
-		public static bool MenuKeyIsDown => KeyIsDown(VirtualKeys.Menu);
 
-		public static void SimulateKeyDown(VirtualKeys key) => keybd_event((byte)key, 0, KEYEVENTF_EXTENDEDKEY | 0, 0);
+		public KeyboardCombination Parse(string combination)
+		{
+			var tokens = combination.Split(new[] {'='}, 2, StringSplitOptions.RemoveEmptyEntries);
+			if (tokens.Length != 2)
+				return new KeyboardCombination($"Could not parse a key and value from {combination}");
 
-		public static void SimulateKeyUp(VirtualKeys key) => keybd_event((byte)key, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+			var shortcut = tokens[1].Trim();
+			var command = tokens[0].Trim();
+			Action action = null;
+			if (Regex.IsMatch(command, @"\d+$"))
+			{
+				var subTokens = Regex.Split(command, @"(?=\d)");
+				command = subTokens[0];
+				var numeric = int.Parse(subTokens[1]);
+				if (this._windowManagerActions.NumericCommands.TryGetValue(command, out var r) && r != null)
+					action = () => r(numeric);
+				else
+					return new KeyboardCombination($"{command}{numeric} is not a valid action");
+			}
+			else
+			{
+				if (this._windowManagerActions.Commands.TryGetValue(command, out var r) && r != null)
+					action = r;
+				else
+					return new KeyboardCombination($"{command} is not a valid action");
+			}
+			return ParseShortcut(shortcut, action);
+
+		}
+
+		private static KeyboardCombination ParseShortcut(string shortcut, Action action)
+		{
+			var keys = shortcut.Split(new[] {"+"}, StringSplitOptions.RemoveEmptyEntries)
+				.Select(key => key.Trim())
+				.ToArray();
+
+			var virtualKeys = keys.Select(k => new
+			{
+				parsed = TryParseSingleKey(k, out var key),
+				key
+			}).ToArray();
+			if (virtualKeys.All(v => v.parsed))
+			{
+				var shortCut = new HashSet<VirtualKeys>(virtualKeys.Select(v => v.key).ToArray());
+				shortCut.Add(VirtualKeys.RightWindows);
+				return new KeyboardCombination(shortCut, action);
+			}
+
+			var invalidKeys = string.Join(", ", virtualKeys.Where(v => !v.parsed).Select(v => v.key));
+			var errorMessage = $"The following keys could not be parsed:{invalidKeys}";
+			return new KeyboardCombination(errorMessage);
+		}
+
+		private static bool TryParseSingleKey(string key, out VirtualKeys virtualKey)
+		{
+			if (int.TryParse(key, NumberStyles.None, CultureInfo.InvariantCulture, out var i))
+				key = $"N{i}";
+			return Enum.TryParse(key, ignoreCase: true, out virtualKey);
+		}
 	}
+
+
 
 	public class KeyboardCombination
 	{
 		private readonly string _errorMessage;
 		public HashSet<VirtualKeys> Shortcut { get; }
+		public Action Action { get; }
 		public HashSet<VirtualKeys>[] ShortcutAlternatives { get; }
 		public bool IsPressed(KeyboardCombination combination) => ShortcutAlternatives.Any(p => p.SetEquals(combination.Shortcut));
 
-		protected internal KeyboardCombination(HashSet<VirtualKeys> shortcut, string errorMessage = null)
+		protected internal KeyboardCombination(string errorMessage = null) => this._errorMessage = errorMessage;
+
+		protected internal KeyboardCombination(HashSet<VirtualKeys> shortcut, Action action = null)
 		{
 			this.Shortcut = shortcut ?? new HashSet<VirtualKeys>();
 			this.ShortcutAlternatives = CreateShortCutAlternatives(shortcut).ToArray();
-			_errorMessage = errorMessage;
+			this.Action = action;
 		}
 
 		private static IEnumerable<HashSet<VirtualKeys>> CreateShortCutAlternatives(HashSet<VirtualKeys> shortcut)
@@ -104,67 +170,25 @@ namespace Awem
 			return alternative;
 		}
 
-		public static KeyboardCombination Parse(string combination)
-		{
-			var keys = combination.Split(new [] {"+"}, StringSplitOptions.RemoveEmptyEntries)
-				.Select(key => key.Trim())
-				.ToArray();
-
-			var virtualKeys = keys.Select(k => new
-			{
-				parsed = TryParseSingleKey(k, out var key),
-				key
-			}).ToArray();
-			if (virtualKeys.All(v => v.parsed))
-			{
-				var shortCut = new HashSet<VirtualKeys>(virtualKeys.Select(v => v.key).ToArray());
-				shortCut.Add(VirtualKeys.RightWindows);
-				return new KeyboardCombination(shortCut);
-			}
-
-			var invalidKeys = string.Join(", ", virtualKeys.Where(v => !v.parsed).Select(v => v.key));
-			var errorMessage = $"The following keys could not be parsed:{invalidKeys}";
-			return new KeyboardCombination(null, errorMessage);
-		}
-
-		private static bool TryParseSingleKey(string key, out VirtualKeys virtualKey)
-		{
-			if (int.TryParse(key, NumberStyles.None, CultureInfo.InvariantCulture, out var i))
-				key = $"N{i}";
-			return Enum.TryParse(key, ignoreCase: true, out virtualKey);
-		}
-
 		public override string ToString()
 		{
 			var keys = this.Shortcut.Select(k => Enum.GetName(typeof(VirtualKeys), k));
 			return $"{string.Join("+", keys)}";
 		}
 
-		public static readonly KeyboardCombination[] Combinations = new[]
-		{
-			Parse("N0"),
-			Parse("1"),
-			Parse("N2"),
-			Parse("3"),
-			Parse("N4"),
-			Parse("Shift+N0"),
-			Parse("Shift+1"),
-			Parse("Shift+N2"),
-			Parse("Shift+3"),
-			Parse("Shift+N4"),
-			Parse("X"),
-			Parse("Back"),
-		}.OrderByDescending(p=>p.Shortcut.Count).ToArray();
 	}
+
 
 	public class KeyboardHooks : IDisposable
 	{
-		private readonly DesktopManager _desktopManager;
+		private readonly KeyboardCombinationParser _parser;
+		private readonly KeyboardCombination[] _combinations;
 		private readonly LowLevelKeyboardProc _hookCallback;
 
-		public KeyboardHooks(DesktopManager desktopManager)
+		public KeyboardHooks(KeyboardCombinationParser parser)
 		{
-			_desktopManager = desktopManager;
+			this._parser = parser;
+			this._combinations = parser.ToKeyboardCombinations();
 			using (var curProcess = Process.GetCurrentProcess())
 			using (var curModule = curProcess.MainModule)
 			{
@@ -239,7 +263,7 @@ namespace Awem
 				return CallNextHookEx(_keyboardHookHandle, nCode, wParam, ref lParam);
 			}
 
-			var combinationDown = KeyboardCombination.Combinations.FirstOrDefault(c => c.IsPressed(currentCombination));
+			var combinationDown = this._combinations.FirstOrDefault(c => c.IsPressed(currentCombination));
 			if (combinationDown == null || combinationDown.Shortcut.Count == 0)
 			{
 				if (isKeyUp) this.PressedKeys.Remove(currentKey);
@@ -253,6 +277,7 @@ namespace Awem
 			if (!isKeyUp) return _preventProcessing;
 
 			Console.WriteLine($"-> {combinationDown}");
+			combinationDown.Action.Invoke();
 
 			if (currentKey == VirtualKeys.X) EventLoop.Break();
 //			// tab

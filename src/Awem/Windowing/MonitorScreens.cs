@@ -9,6 +9,7 @@ namespace Awem.Windowing
 	public static class MonitorScreens
 	{
 		private static int TimesOutput = 0;
+
 		public static void EnumerateScreens()
 		{
 			TimesOutput++;

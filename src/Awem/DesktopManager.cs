@@ -44,6 +44,13 @@ namespace Awem
 			if (desktop >= 0 && desktop < desktops.Length)
 				desktops[desktop].Switch();
 		}
+		public void CreateDesktop()
+		{
+			VirtualDesktop.Create();
+			VirtualDesktop.GetDesktops().Last().Switch();
+		}
+
+		public void RemoveDesktop() => VirtualDesktop.Current.Remove();
 
 		private void EnsureDesktops(int desired)
 		{
