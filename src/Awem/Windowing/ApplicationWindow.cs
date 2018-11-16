@@ -167,61 +167,18 @@ namespace Awem.Windowing
 			{
 				pressed = true;
 				KeyboardStateManager.SimulateKeyDown(VirtualKeys.Menu);
+				Console.WriteLine("Menu Down");
 			}
 
 			SetForegroundWindow(this.WindowHandler);
 			SetActiveWindow(this.WindowHandler);
 			SetFocus(this.WindowHandler);
 
-
 			if (pressed) {
 				KeyboardStateManager.SimulateKeyUp(VirtualKeys.Menu);
+				Console.WriteLine("Menu Up");
 			}
 
-			return;
-
-			//if (this.WindowHandler == GetForegroundWindow()) return;
-			//cmd needs to be called synchronous.
-			if (this.ProcessName.EndsWith("cmd.exe"))
-			{
-				if (IsIconic(this.WindowHandler)) ShowWindow(this.WindowHandler, (int)WindowState.SW_RESTORE);
-				SetForegroundWindow(this.WindowHandler);
-				SetActiveWindow(this.WindowHandler);
-				SetFocus(this.WindowHandler);
-				return;
-			}
-
-			var threadId1 = GetWindowThreadProcessId(GetForegroundWindow(), IntPtr.Zero);
-			var threadId2 = GetWindowThreadProcessId(this.WindowHandler, IntPtr.Zero);
-
-			if (threadId1 != threadId2)
-			{
-				AttachThreadInput(threadId1, threadId2, 1);
-				SetForegroundWindow(this.WindowHandler);
-				SetActiveWindow(this.WindowHandler);
-				SwitchToThisWindow(this.WindowHandler, true);
-				SetFocus(this.WindowHandler);
-				AttachThreadInput(threadId1, threadId2, 0);
-			}
-			else
-			{
-				SetForegroundWindow(this.WindowHandler);
-				SetActiveWindow(this.WindowHandler);
-				SwitchToThisWindow(this.WindowHandler, true);
-				SetFocus(this.WindowHandler);
-			}
-
-			return;
-
-			if (IsIconic(this.WindowHandler))
-				ShowWindowAsync(this.WindowHandler, (int)WindowState.SW_RESTORE);
-			else
-			{
-				if (IsZoomed(this.WindowHandler))
-					ShowWindowAsync(this.WindowHandler, (int)WindowState.SW_SHOWMAXIMIZED);
-				else
-					ShowWindowAsync(this.WindowHandler, (int)WindowState.SW_SHOWNORMAL);
-			}
 		}
 		[DllImport("kernel32.dll")]
 		private static extern IntPtr OpenProcess(uint dwDesiredAccess, int bInheritHandle, uint dwProcessId);
@@ -249,16 +206,13 @@ namespace Awem.Windowing
 			var r = filename.ToString();
 			if (r.StartsWith("?"))
 				r = "C" + r.Substring(1, r.Length - 1);
-			this._processName = r;
+			_processName = r;
 			return r;
 		}
 		[DllImport("user32.dll")]
 		private static extern int SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
 		private const int WM_KILLFOCUS = 0x0008;
 
-		public void KillFocus()
-		{
-			SendMessage(this.WindowHandler, WM_KILLFOCUS, IntPtr.Zero, IntPtr.Zero);
-		}
+		public void KillFocus() => SendMessage(this.WindowHandler, WM_KILLFOCUS, IntPtr.Zero, IntPtr.Zero);
 	}
 }

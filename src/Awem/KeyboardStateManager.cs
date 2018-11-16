@@ -18,11 +18,23 @@ namespace Awem
 		private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, int dwExtraInfo);
 
 		public static bool KeyIsDown(VirtualKeys key) => (GetKeyState((ushort)key) & 0x8000) != 0;
-		
+
 		public static bool MenuKeyIsDown => KeyIsDown(VirtualKeys.Menu);
 
-		public static void SimulateKeyDown(VirtualKeys key) => keybd_event((byte)key, 0, KEYEVENTF_EXTENDEDKEY | 0, 0);
+		public static bool SimulatingKey { get; private set; }
 
-		public static void SimulateKeyUp(VirtualKeys key) => keybd_event((byte)key, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+		public static void SimulateKeyDown(VirtualKeys key)
+		{
+			SimulatingKey = true;
+			keybd_event((byte) key, 0, KEYEVENTF_EXTENDEDKEY | 0, 0);
+			SimulatingKey = false;
+		}
+
+		public static void SimulateKeyUp(VirtualKeys key)
+		{
+			SimulatingKey = true;
+			keybd_event((byte) key, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+			SimulatingKey = false;
+		}
 	}
 }

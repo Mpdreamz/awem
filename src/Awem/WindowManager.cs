@@ -7,6 +7,7 @@ using System.Reflection;
 using WindowsDesktop;
 using Awem.EventNotifiers;
 using Awem.PInvoke;
+using Awem.PInvoke.Enums;
 using Awem.Windowing;
 using ReactiveUI;
 
@@ -96,7 +97,8 @@ namespace Awem
 			this.LayoutManager = new LayoutManager(desktopChange);
 			this.WindowManagerActions = new WindowManagerActions(this);
 
-			var keyboardParser = new KeyboardCombinationParser(this.WindowManagerActions);
+			var leaderKey = VirtualKeys.RightMenu;
+			var keyboardParser = new KeyboardCombinationParser(leaderKey, this.WindowManagerActions);
 
 			this.KeyboardHooks = new KeyboardHooks(keyboardParser);
 		}

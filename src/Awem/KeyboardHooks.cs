@@ -17,9 +17,15 @@ namespace Awem
 	{
 		private readonly WindowManagerActions _windowManagerActions;
 
-		public KeyboardCombinationParser(WindowManagerActions windowManagerActions) => _windowManagerActions = windowManagerActions;
+		public KeyboardCombinationParser(VirtualKeys leaderKey, WindowManagerActions windowManagerActions)
+		{
+			this.LeaderKey = leaderKey;
+			_windowManagerActions = windowManagerActions;
+		}
 
-		private readonly string[] DefaultShortcuts = new[]
+		public VirtualKeys LeaderKey { get; }
+
+		private readonly string[] _defaultShortcuts =
 		{
 			$"{nameof(WindowManagerActions.GotoDesktop)}0=N1",
 			$"{nameof(WindowManagerActions.GotoDesktop)}1=2",
@@ -50,9 +56,12 @@ namespace Awem
 
 		public KeyboardCombination[] ToKeyboardCombinations(IEnumerable<string> config = null)
 		{
-			var c = DefaultShortcuts.Union(config ?? Enumerable.Empty<string>());
-			return c.Select(this.Parse).Where(p=>p.Shortcut != null).OrderByDescending(p=>p.Shortcut.Count).ToArray();
+			var c = _defaultShortcuts.Union(config ?? Enumerable.Empty<string>());
+			return c.Select(this.Parse).Where(p => p.Shortcut != null).OrderByDescending(p => p.Shortcut.Count)
+				.ToArray();
 		}
+
+		private static VirtualKeys[] MenuKeys = { VirtualKeys.RightMenu, VirtualKeys.LeftMenu, VirtualKeys.Menu };
 
 		public KeyboardCombination Parse(string combination)
 		{
@@ -60,9 +69,10 @@ namespace Awem
 			if (tokens.Length != 2)
 				return new KeyboardCombination($"Could not parse a key and value from {combination}");
 
+
 			var shortcut = tokens[1].Trim();
 			var command = tokens[0].Trim();
-			Action action = null;
+			Action action;
 			if (Regex.IsMatch(command, @"\d+$"))
 			{
 				var subTokens = Regex.Split(command, @"(?=\d)");
@@ -84,7 +94,7 @@ namespace Awem
 
 		}
 
-		private static KeyboardCombination ParseShortcut(string shortcut, Action action)
+		private KeyboardCombination ParseShortcut(string shortcut, Action action)
 		{
 			var keys = shortcut.Split(new[] {"+"}, StringSplitOptions.RemoveEmptyEntries)
 				.Select(key => key.Trim())
@@ -98,7 +108,7 @@ namespace Awem
 			if (virtualKeys.All(v => v.parsed))
 			{
 				var shortCut = new HashSet<VirtualKeys>(virtualKeys.Select(v => v.key).ToArray());
-				shortCut.Add(VirtualKeys.RightWindows);
+				shortCut.Add(this.LeaderKey);
 				return new KeyboardCombination(shortCut, action);
 			}
 
@@ -113,69 +123,6 @@ namespace Awem
 				key = $"N{i}";
 			return Enum.TryParse(key, ignoreCase: true, out virtualKey);
 		}
-	}
-
-
-
-	public class KeyboardCombination
-	{
-		private readonly string _errorMessage;
-		public HashSet<VirtualKeys> Shortcut { get; }
-		public Action Action { get; }
-		public HashSet<VirtualKeys>[] ShortcutAlternatives { get; }
-		public bool IsPressed(KeyboardCombination combination) => ShortcutAlternatives.Any(p => p.SetEquals(combination.Shortcut));
-
-		protected internal KeyboardCombination(string errorMessage = null) => this._errorMessage = errorMessage;
-
-		protected internal KeyboardCombination(HashSet<VirtualKeys> shortcut, Action action = null)
-		{
-			this.Shortcut = shortcut ?? new HashSet<VirtualKeys>();
-			this.ShortcutAlternatives = CreateShortCutAlternatives(shortcut).ToArray();
-			this.Action = action;
-		}
-
-		private static IEnumerable<HashSet<VirtualKeys>> CreateShortCutAlternatives(HashSet<VirtualKeys> shortcut)
-		{
-			yield return shortcut;
-			if (shortcut.Contains(VirtualKeys.Shift))
-			{
-				foreach (var p in LocalAlternatives(shortcut, VirtualKeys.Shift, VirtualKeys.RightShift)) yield return p;
-				foreach (var p in LocalAlternatives(shortcut, VirtualKeys.Shift, VirtualKeys.LeftShift)) yield return p;
-			}
-			else if (shortcut.Contains(VirtualKeys.Control))
-			{
-				foreach (var p in LocalAlternatives(shortcut, VirtualKeys.Control, VirtualKeys.LeftControl)) yield return p;
-				foreach (var p in LocalAlternatives(shortcut, VirtualKeys.Control, VirtualKeys.RightControl)) yield return p;
-			}
-			else if (shortcut.Contains(VirtualKeys.Menu))
-			{
-				foreach (var p in LocalAlternatives(shortcut, VirtualKeys.Menu, VirtualKeys.LeftMenu)) yield return p;
-				foreach (var p in LocalAlternatives(shortcut, VirtualKeys.Menu, VirtualKeys.RightMenu)) yield return p;
-			}
-		}
-
-		private static IEnumerable<HashSet<VirtualKeys>> LocalAlternatives(HashSet<VirtualKeys> shortcut, VirtualKeys oldKey, VirtualKeys newKey)
-		{
-			var a = CreateAlternative(shortcut, oldKey, newKey);
-			foreach (var al in CreateShortCutAlternatives(a)) yield return al;
-		}
-
-		private static HashSet<VirtualKeys> CreateAlternative(HashSet<VirtualKeys> shortcut, VirtualKeys oldKey, VirtualKeys newKey)
-		{
-			var temp = new VirtualKeys[shortcut.Count];
-			shortcut.CopyTo(temp);
-			var alternative = new HashSet<VirtualKeys>(temp);
-			alternative.Remove(oldKey);
-			alternative.Add(newKey);
-			return alternative;
-		}
-
-		public override string ToString()
-		{
-			var keys = this.Shortcut.Select(k => Enum.GetName(typeof(VirtualKeys), k));
-			return $"{string.Join("+", keys)}";
-		}
-
 	}
 
 
@@ -238,22 +185,26 @@ namespace Awem
 
 		private bool _hotKeyIsDown;
 		private HashSet<VirtualKeys> PressedKeys = new HashSet<VirtualKeys>();
+		private bool _callingAction;
 
 		private IntPtr HookCallback(int nCode, IntPtr wParam, ref LowLevelKeyboardEvent lParam)
 		{
 			if (nCode < 0) return CallNextHookEx(_keyboardHookHandle, nCode, wParam, ref lParam);
+			if (KeyboardStateManager.SimulatingKey) return _preventProcessing;
 
-			const VirtualKeys leaderKey = VirtualKeys.RightWindows;
 			var currentKey = (VirtualKeys)lParam.VirtualKeyCode;
 			var isKeyUp = (wParam == WM_KEYUP || wParam == WM_SYSKEYUP);
+
 			if (!isKeyUp) this.PressedKeys.Add(currentKey);
+
 			var currentCombination = new KeyboardCombination(this.PressedKeys);
 
-			var leaderKeyCurrent = currentKey == leaderKey;
+			var leaderKeyCurrent = currentKey == this._parser.LeaderKey;
 			if (leaderKeyCurrent)
 			{
 				_hotKeyIsDown = !isKeyUp;
 				if (isKeyUp) this.PressedKeys.Clear();
+
 				return _preventProcessing;
 			}
 
@@ -280,34 +231,9 @@ namespace Awem
 			combinationDown.Action.Invoke();
 
 			if (currentKey == VirtualKeys.X) EventLoop.Break();
-//			// tab
-//			else if (currentKey == VirtualKeys.Back)
-//			{
-//				_desktopManager.GotoPreviousDesktop();
-//			}
-//
-//			// numeric
-//			else if (currentKey >= VirtualKeys.N0 && currentKey <= VirtualKeys.N9)
-//			{
-//				var key = (int) currentKey - 48;
-//				var nth = key - 1 < 0 ? 9 : key - 1;
-//				if (shiftPressed)
-//					_desktopManager.MoveToDesktop(nth, ApplicationWindows.Current);
-//				else _desktopManager.GotoDesktop(nth);
-//			}
+
 			if (isKeyUp) this.PressedKeys.Remove(currentKey);
 			return _preventProcessing;
-
-			if (nCode >= 0 && (wParam == WM_SYSKEYUP || wParam == WM_SYSKEYDOWN))
-			{
-//				if (currentKey == 9 && lParam.flags == 32)
-//				{
-//					if (User32KeyboardHook.AlternativeAltTabBehavior != null)
-//						User32KeyboardHook.AlternativeAltTabBehavior();
-//					return new IntPtr(1);
-//				}
-			}
-			return CallNextHookEx(_keyboardHookHandle, nCode, wParam, ref lParam);
 		}
 
 		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
