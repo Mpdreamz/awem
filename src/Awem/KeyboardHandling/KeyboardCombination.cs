@@ -3,20 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using Awem.PInvoke.Enums;
 
-namespace Awem
+namespace Awem.KeyboardHandling
 {
 	public class KeyboardCombination
 	{
 		private readonly string _errorMessage;
 		public HashSet<VirtualKeys> Shortcut { get; }
 		public Action Action { get; }
+		public string Command { get; }
 		public HashSet<VirtualKeys>[] ShortcutAlternatives { get; }
 		public bool IsPressed(KeyboardCombination combination) => this.ShortcutAlternatives.Any(p => p.SetEquals(combination.Shortcut));
 
 		protected internal KeyboardCombination(string errorMessage = null) => this._errorMessage = errorMessage;
 
-		protected internal KeyboardCombination(HashSet<VirtualKeys> shortcut, Action action = null)
+		protected internal KeyboardCombination(HashSet<VirtualKeys> shortcut, Action action = null, string commandName = null)
 		{
+			this.Command = commandName;
 			this.Shortcut = shortcut ?? new HashSet<VirtualKeys>();
 			this.ShortcutAlternatives = CreateShortCutAlternatives(shortcut).ToArray();
 			this.Action = action;
@@ -60,7 +62,7 @@ namespace Awem
 
 		public override string ToString()
 		{
-			var keys = this.Shortcut.Select(k => Enum.GetName(typeof(VirtualKeys), k));
+			var keys = this.Shortcut.Select(k => Enum.GetName(typeof(VirtualKeys), k).Replace("Menu", "Alt"));
 			return $"{string.Join("+", keys)}";
 		}
 

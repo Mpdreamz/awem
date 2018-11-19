@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using WindowsDesktop;
+using Awem.KeyboardHandling;
 using Awem.PInvoke.Enums;
 
 namespace Awem.Windowing
@@ -167,7 +168,6 @@ namespace Awem.Windowing
 			{
 				pressed = true;
 				KeyboardStateManager.SimulateKeyDown(VirtualKeys.Menu);
-				Console.WriteLine("Menu Down");
 			}
 
 			SetForegroundWindow(this.WindowHandler);
@@ -176,7 +176,6 @@ namespace Awem.Windowing
 
 			if (pressed) {
 				KeyboardStateManager.SimulateKeyUp(VirtualKeys.Menu);
-				Console.WriteLine("Menu Up");
 			}
 
 		}

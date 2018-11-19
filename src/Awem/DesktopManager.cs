@@ -30,6 +30,8 @@ namespace Awem
 
 		public void GotoPreviousDesktop() => this.GotoDesktop(this.PreviousDesktop);
 
+		public int GetDesktopsLength() => VirtualDesktop.GetDesktops().Length;
+
 		public void MoveToDesktop(int desktop, ApplicationWindow window)
 		{
 			if (window == null) return;

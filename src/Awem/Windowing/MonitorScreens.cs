@@ -30,7 +30,11 @@ namespace Awem.Windowing
 
 		private static ConcurrentDictionary<IntPtr, MonitorScreen> MonitorCache = new ConcurrentDictionary<IntPtr, MonitorScreen>();
 
-		public static ICollection<MonitorScreen> All() => MonitorCache.Values;
+		public static ICollection<MonitorScreen> All()
+		{
+			Refresh();
+			return MonitorCache.Values;
+		}
 
 		public static void Refresh()
 		{

@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Awem.PInvoke.Enums;
 
-namespace Awem
+namespace Awem.KeyboardHandling
 {
 	public static class KeyboardStateManager
 	{
