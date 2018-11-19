@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Awem.PInvoke
+namespace Awem.CommandLine
 {
 	public static class EventLoop
 	{

@@ -3,14 +3,14 @@ using System.Linq;
 using WindowsDesktop;
 using Awem.PInvoke;
 
-namespace Awem
+namespace Awem.CommandLine
 {
 	internal static class Program
 	{
 		private static int Main(string[] args)
 		{
 			Console.WriteLine("Initializing engine...");
-			using(var wm = new WindowManager())
+			using(var wm = new WindowManager(null, EventLoop.Break))
 			{
 				Console.WriteLine($"Awem started!");
 				PrintCleanExitCommad(wm);

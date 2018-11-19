@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Awem", "Awem\Awem.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualDesktop", "..\..\VirtualDesktop\source\VirtualDesktop\VirtualDesktop.csproj", "{AB848ECD-76AA-41C0-B63D-86A8591B25AA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Awem.CommandLine", "Awem.CommandLine\Awem.CommandLine.csproj", "{20EF2B9D-DE70-4D6E-B26E-8BEAB8CB9915}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Awem.Launcher", "Awem.Launcher\Awem.Launcher.csproj", "{26E9EA6C-0DBB-4A9F-8521-CD60EA0FDAF6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{AB848ECD-76AA-41C0-B63D-86A8591B25AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB848ECD-76AA-41C0-B63D-86A8591B25AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB848ECD-76AA-41C0-B63D-86A8591B25AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20EF2B9D-DE70-4D6E-B26E-8BEAB8CB9915}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20EF2B9D-DE70-4D6E-B26E-8BEAB8CB9915}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20EF2B9D-DE70-4D6E-B26E-8BEAB8CB9915}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20EF2B9D-DE70-4D6E-B26E-8BEAB8CB9915}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26E9EA6C-0DBB-4A9F-8521-CD60EA0FDAF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26E9EA6C-0DBB-4A9F-8521-CD60EA0FDAF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26E9EA6C-0DBB-4A9F-8521-CD60EA0FDAF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26E9EA6C-0DBB-4A9F-8521-CD60EA0FDAF6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

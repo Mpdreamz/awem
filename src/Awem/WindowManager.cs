@@ -28,7 +28,7 @@ namespace Awem
 		public ICollection<ApplicationWindow> AllApplications => ApplicationWindows.All().ToList();
 		public ICollection<ApplicationWindow> CurrentDesktopApplications => ApplicationWindows.VisibleOnCurrentDesktop().ToList();
 
-		public WindowManager()
+		public WindowManager(Action toggleLauncherUi, Action exit)
 		{
 			this.UserPreferenceChangedNotifier = new UserPreferenceChangedNotifier();
 			this.DisplaySettingsChangedNotifier = new DisplaySettingsChangedNotifier();
@@ -49,7 +49,7 @@ namespace Awem
 				vm => vm.DesktopManager.CurrentDesktop
 			);
 			this.LayoutManager = new LayoutManager(desktopChange);
-			this.WindowManagerActions = new WindowManagerActions(this);
+			this.WindowManagerActions = new WindowManagerActions(this, toggleLauncherUi, exit);
 
 			var leaderKey = VirtualKeys.RightMenu;
 			var keyboardParser = new KeyboardCombinationParser(leaderKey, this.WindowManagerActions, null);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using Awem.PInvoke;
 using Awem.Windowing;
 
@@ -14,22 +15,24 @@ namespace Awem
 		public Action CreateDesktop { get; }
 		public Action RemoveDesktop { get; }
 		public Action Die { get; }
+		public Action ToggleLauncher { get; }
 
 		public IDictionary<string, Action> Commands { get;  }
 
 		public IDictionary<string, Action<int>> NumericCommands { get;  }
 
-		public WindowManagerActions(WindowManager manager)
+		public WindowManagerActions(WindowManager manager, Action toggleLauncherUi, Action exit)
 		{
 			this.Commands = new Dictionary<string, Action>(StringComparer.CurrentCultureIgnoreCase);
 			this.NumericCommands = new Dictionary<string, Action<int>>(StringComparer.CurrentCultureIgnoreCase);
 
-			this.GotoDesktop = i => manager.DesktopManager.GotoDesktop(i);
+			this.GotoDesktop = i => Task.Run(()=>manager.DesktopManager.GotoDesktop(i));
 			this.MoveToDesktop = i => manager.DesktopManager.MoveToDesktop(i, ApplicationWindows.Current);
 			this.GotoPreviousDesktop = () => manager.DesktopManager.GotoPreviousDesktop();
 			this.CreateDesktop = () => manager.DesktopManager.CreateDesktop();
 			this.RemoveDesktop = () => manager.DesktopManager.RemoveDesktop();
-			this.Die = EventLoop.Break;
+			this.ToggleLauncher = toggleLauncherUi ?? (() => { });
+			this.Die = exit ?? (() => { });
 
 			var props = this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
 			foreach (var prop in props)
