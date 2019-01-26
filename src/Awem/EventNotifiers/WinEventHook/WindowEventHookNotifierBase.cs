@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
-namespace Awem
+namespace Awem.EventNotifiers.WinEventHook
 {
 	[SuppressMessage("ReSharper", "InconsistentNaming")]
 	[SuppressMessage("ReSharper", "IdentifierTypo")]

@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using Awem.PInvoke.Enums;
 
-namespace Awem.Windowing
+namespace Awem.Reactive.TaskBars
 {
 	public class PrimaryTaskBar : TaskBarBase
 	{

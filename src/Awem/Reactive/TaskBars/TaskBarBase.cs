@@ -1,10 +1,10 @@
 ﻿using System.Drawing;
 
-namespace Awem.Windowing
+namespace Awem.Reactive.TaskBars
 {
 	public abstract class TaskBarBase
 	{
-		protected TaskBarBase(TaskBarHandle handle) => TaskBarHandle = handle;
+		protected TaskBarBase(TaskBarHandle handle) => this.TaskBarHandle = handle;
 
 		public TaskBarHandle TaskBarHandle { get; }
 

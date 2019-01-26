@@ -2,13 +2,12 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Reactive.Subjects;
-using System.Runtime.CompilerServices;
 using Awem.EventNotifiers;
-using Awem.Windowing;
+using Awem.Reactive.TaskBars;
 using DynamicData;
 using ReactiveUI;
 
-namespace Awem
+namespace Awem.Reactive.Monitors
 {
 	public class MonitorManager : ReactiveObject, IDisposable
 	{
@@ -40,13 +39,13 @@ namespace Awem
 			);
 
 			_taskBarCache.Connect()
-				.Transform(CreateTaskBar)
+				.Transform(this.CreateTaskBar)
 				.OnItemRemoved(RemoveTaskBar)
 				.Bind(out _taskBars);
 
 
 			_monitorCache.Connect()
-				.Transform(CreateMonitor)
+				.Transform(this.CreateMonitor)
 				.OnItemRemoved(RemoveMonitor)
 				.Bind(out _monitors);
 

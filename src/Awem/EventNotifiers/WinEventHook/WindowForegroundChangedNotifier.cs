@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Microsoft.Win32;
 
-namespace Awem
+namespace Awem.EventNotifiers.WinEventHook
 {
 	// see https://docs.microsoft.com/en-gb/windows/desktop/api/winuser/nc-winuser-wineventproc
 	// and https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setwineventhook

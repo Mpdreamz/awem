@@ -3,7 +3,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using WindowsDesktop;
 
-namespace Awem
+namespace Awem.EventNotifiers.WinEventHook
 {
 	public class DesktopSwitchNotifier : WindowEventHookNotifierBase
 	{

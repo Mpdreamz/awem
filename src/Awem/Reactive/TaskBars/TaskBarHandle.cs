@@ -1,7 +1,6 @@
 using System;
-using System.Drawing;
 
-namespace Awem.Windowing
+namespace Awem.Reactive.TaskBars
 {
 	public struct TaskBarHandle : IEquatable<TaskBarHandle>
 	{

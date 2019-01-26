@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Awem.PInvoke.Structs;
+using Awem.Reactive.TaskBars;
 
-namespace Awem.Windowing
+namespace Awem.Reactive.Monitors
 {
 	public class MonitorScreen
 	{

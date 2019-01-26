@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Awem.PInvoke.Enums;
+using Awem.Windowing;
 
-namespace Awem.Windowing
+namespace Awem.Reactive.TaskBars
 {
 	public static class TaskBarWin32
 	{

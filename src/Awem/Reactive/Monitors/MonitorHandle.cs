@@ -1,7 +1,7 @@
 using System;
 using System.Drawing;
 
-namespace Awem.Windowing
+namespace Awem.Reactive.Monitors
 {
 	public struct MonitorHandle : IEquatable<MonitorHandle>
 	{

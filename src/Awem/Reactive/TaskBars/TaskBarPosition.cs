@@ -1,4 +1,4 @@
-﻿namespace Awem.Windowing
+﻿namespace Awem.Reactive.TaskBars
 {
 	public enum TaskBarPosition
 	{

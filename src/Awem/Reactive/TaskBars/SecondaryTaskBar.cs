@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Awem.Windowing;
 
-namespace Awem.Windowing
+namespace Awem.Reactive.TaskBars
 {
 	public sealed class SecondaryTaskBar : TaskBarBase, IDisposable
 	{

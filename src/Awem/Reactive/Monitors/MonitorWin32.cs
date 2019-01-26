@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using Awem.PInvoke.Enums;
 using Awem.PInvoke.Structs;
 
-namespace Awem.Windowing
+namespace Awem.Reactive.Monitors
 {
 	internal static class MonitorWin32
 	{

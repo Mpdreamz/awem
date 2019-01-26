@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Awem.EventNotifiers.WinEventHook;
 using Awem.KeyboardHandling;
 using Awem.PInvoke.Enums;
+using Awem.Reactive.Monitors;
 using Awem.Windowing;
 using ReactiveUI;
 
