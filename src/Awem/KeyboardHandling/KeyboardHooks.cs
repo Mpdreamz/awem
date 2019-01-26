@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Awem.PInvoke.Enums;
 
 namespace Awem.KeyboardHandling
@@ -64,7 +65,9 @@ namespace Awem.KeyboardHandling
 
 		private bool _hotKeyIsDown;
 		private HashSet<VirtualKeys> PressedKeys = new HashSet<VirtualKeys>();
-		private bool _callingAction;
+
+		private VirtualKeys? _lastKey = null;
+		private bool? _lastKeyDirection = null;
 
 		private IntPtr HookCallback(int nCode, IntPtr wParam, ref LowLevelKeyboardEvent lParam)
 		{
@@ -73,17 +76,22 @@ namespace Awem.KeyboardHandling
 
 			var currentKey = (VirtualKeys)lParam.VirtualKeyCode;
 			var isKeyUp = (wParam == WM_KEYUP || wParam == WM_SYSKEYUP);
+			var leaderKeyCurrent = currentKey == this._parser.LeaderKey;
+			if (currentKey == _lastKey && _lastKeyDirection == isKeyUp && _hotKeyIsDown)
+			{
+				//already handled this case, early exit here since keydown triggers continuously
+				return _preventProcessing;
+			}
+
+			_lastKey = currentKey;
+			_lastKeyDirection = isKeyUp;
 
 			if (!isKeyUp) this.PressedKeys.Add(currentKey);
 
-			var currentCombination = new KeyboardCombination(this.PressedKeys);
-
-			var leaderKeyCurrent = currentKey == this._parser.LeaderKey;
 			if (leaderKeyCurrent)
 			{
 				_hotKeyIsDown = !isKeyUp;
 				if (isKeyUp) this.PressedKeys.Clear();
-
 				return _preventProcessing;
 			}
 
@@ -93,6 +101,7 @@ namespace Awem.KeyboardHandling
 				return CallNextHookEx(_keyboardHookHandle, nCode, wParam, ref lParam);
 			}
 
+			var currentCombination = new KeyboardCombination(this.PressedKeys);
 			var combinationDown = this.Combinations.FirstOrDefault(c => c.IsPressed(currentCombination));
 			if (combinationDown == null || combinationDown.Shortcut.Count == 0)
 			{
@@ -106,7 +115,7 @@ namespace Awem.KeyboardHandling
 			//we could still be building up our key combination
 			if (!isKeyUp) return _preventProcessing;
 
-			combinationDown.Action.Invoke();
+			Task.Run(combinationDown.Action);
 
 			if (isKeyUp) this.PressedKeys.Remove(currentKey);
 			return _preventProcessing;

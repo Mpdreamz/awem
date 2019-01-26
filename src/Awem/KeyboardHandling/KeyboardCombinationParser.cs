@@ -50,6 +50,7 @@ namespace Awem.KeyboardHandling
 			$"{nameof(WindowManagerActions.MoveToDesktop)}9=Shift+10",
 			$"{nameof(WindowManagerActions.MoveToDesktop)}0=Shift+11",
 			$"{nameof(WindowManagerActions.Die)}=X",
+			$"{nameof(WindowManagerActions.ToggleLauncher)}=D",
 			$"{nameof(WindowManagerActions.GotoPreviousDesktop)}=Back",
 		};
 

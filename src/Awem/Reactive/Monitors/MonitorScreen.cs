@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -8,7 +9,8 @@ namespace Awem.Windowing
 {
 	public class MonitorScreen
 	{
-		private IntPtr MonitorHandle { get; }
+		private readonly IReadOnlyCollection<TaskBarBase> _taskBars;
+		public MonitorHandle MonitorHandle { get; }
 		public Rectangle ScaledResolution { get; internal set; }
 		public MonitorOrientation Orientation { get; private set; }
 		public Rectangle Resolution { get; private set; }
@@ -44,14 +46,15 @@ namespace Awem.Windowing
 			}
 		}
 
-		public TaskBarBase TaskBar => TaskBars.All().FirstOrDefault(t=>this.Resolution.Contains(t.Bounds));
+		public TaskBarBase TaskBar => _taskBars.FirstOrDefault(t => this.Resolution.Contains(t.Bounds));
 
 		// https://docs.microsoft.com/en-gb/windows/desktop/api/wingdi/ns-wingdi-_devicemodea
 		// mentions the primary monitor always starts at location 0,0 as all other monitors extend from it
 		public bool IsPrimary => this.Resolution.X == 0 && this.Resolution.Y == 0;
 
-		public MonitorScreen(IntPtr monitorHandle)
+		public MonitorScreen(MonitorHandle monitorHandle, IReadOnlyCollection<TaskBarBase> taskBars)
 		{
+			_taskBars = taskBars;
 			this.MonitorHandle = monitorHandle;
 			this.Refresh();
 		}
@@ -59,10 +62,10 @@ namespace Awem.Windowing
 		public void Refresh()
 		{
 			var mi = new MonitorInfo { Size = Marshal.SizeOf(typeof(MonitorInfo)) };
-			if (!GetMonitorInfo(this.MonitorHandle, ref mi)) return;
+			if (!MonitorWin32.GetMonitorInfo(this.MonitorHandle, ref mi)) return;
 			var deviceInfo = new DevMode { dmSize = (short) Marshal.SizeOf(typeof(DevMode)) };
 
-			if (!EnumDisplaySettings(mi.DeviceName, ENUM_CURRENT_SETTINGS, ref deviceInfo)) return;
+			if (!MonitorWin32.EnumDisplaySettings(mi.DeviceName, MonitorWin32.ENUM_CURRENT_SETTINGS, ref deviceInfo)) return;
 
 			var orientation = (MonitorOrientation) deviceInfo .dmDisplayOrientation;
 			var actualResolution = new Rectangle(deviceInfo .dmPositionX, deviceInfo .dmPositionY, deviceInfo .dmPelsWidth, deviceInfo .dmPelsHeight);
@@ -73,18 +76,6 @@ namespace Awem.Windowing
 			this.DisplayName = displayName;
 		}
 
-		[DllImport("user32.dll", CharSet = CharSet.Unicode)]
-		private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfo lpmi);
-
-		[DllImport("user32.dll")]
-		private static extern bool EnumDisplaySettings(string deviceName, int modeNum, ref DevMode devMode);
-		private const int ENUM_CURRENT_SETTINGS = -1;
-
-		//TODO Create method to rotate the monitor orientation
-		private const int DMDO_DEFAULT = 0;
-		private const int DMDO_90 = 1;
-		private const int DMDO_180 = 2;
-		private const int DMDO_270 = 3;
 
 	}
 }

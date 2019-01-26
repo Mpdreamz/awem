@@ -3,10 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Awem.Launcher"
 		
         Title="tabalt-unique-window-name-xblah" Height="auto" Width="653" MinHeight="64" MaxHeight="600"
-        WindowStyle="None" ShowInTaskbar="False" AllowsTransparency="True" Topmost="true"
+        WindowStyle="None" ShowInTaskbar="False" AllowsTransparency="True" Topmost="true" Visibility="Visible"
         Background="Transparent" WindowStartupLocation="CenterScreen" 
         mc:Ignorable="d"
         >
@@ -29,7 +28,7 @@
                 </Grid.RowDefinitions>
                 <Border
                     Background="{StaticResource EntryFrameBrush}"
-                    CornerRadius="5" BorderBrush="{StaticResource EntryFrameBorderBrush}" BorderThickness="2,2,2,2" Margin="4" Panel.ZIndex="10">
+                    CornerRadius="5" BorderBrush="{StaticResource EntryFrameBorderBrush}" BorderThickness="2,2,2,0" Margin="2,1" Panel.ZIndex="10">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="42" />
@@ -105,7 +104,7 @@
                                     <DataTemplate>
                                         <!--use a panel to hold the icon-->
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="30">
-                                            <Image Margin="3,3,3,3" Height="24" Width="24" Source="{Binding Path=ImageSource}"/>
+                                            <!-- <Image Margin="3,3,3,3" Height="24" Width="24" Source="{Binding Path=ImageSource}"/> -->
                                             <TextBlock Margin="1,1,1,1" Text="{Binding Path=ProcessName}" Foreground="Orange" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </DataTemplate>
@@ -121,7 +120,7 @@
                             <GridViewColumn Header="Memory" Width="80">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding CommittedMemory}" TextAlignment="Right" Foreground="Gray" HorizontalAlignment="Right"/>
+                                        <TextBlock Text="\{Binding CommittedMemory\}" TextAlignment="Right" Foreground="Gray" HorizontalAlignment="Right"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>

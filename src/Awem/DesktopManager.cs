@@ -21,6 +21,7 @@ namespace Awem
 			};
 			this.EnsureDesktops(10);
 		}
+
 		private int previousDesktop;
 		public int PreviousDesktop { get => previousDesktop; set => this.RaiseAndSetIfChanged(ref previousDesktop, value); }
 		private int currentDesktop;

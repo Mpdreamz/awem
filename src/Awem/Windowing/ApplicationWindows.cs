@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using WindowsDesktop;
 
@@ -34,7 +33,7 @@ namespace Awem.Windowing
 		{
 			var parentHandle = IntPtr.Zero;
 			var childAfter = IntPtr.Zero;
-			for (var i = 0; i < 10_000; i++)
+			for (var i = 0; i < 10_000; i++/**/)
 			{
 				childAfter = FindWindowEx(parentHandle, childAfter, className, null);
 				if (childAfter == IntPtr.Zero) yield break;

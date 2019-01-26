@@ -44,6 +44,7 @@ namespace Tabalt
 
 		public void Dispose()
 		{
+			this._notificationIcon.Visible = false;
 			this._notificationIcon.Dispose();
 			this._notificationMenu.Dispose();
 		}

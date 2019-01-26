@@ -26,11 +26,11 @@ namespace Awem
 			this.Commands = new Dictionary<string, Action>(StringComparer.CurrentCultureIgnoreCase);
 			this.NumericCommands = new Dictionary<string, Action<int>>(StringComparer.CurrentCultureIgnoreCase);
 
-			this.GotoDesktop = i => Task.Run(()=>manager.DesktopManager.GotoDesktop(i));
+			this.GotoDesktop = manager.DesktopManager.GotoDesktop;
 			this.MoveToDesktop = i => manager.DesktopManager.MoveToDesktop(i, ApplicationWindows.Current);
-			this.GotoPreviousDesktop = () => manager.DesktopManager.GotoPreviousDesktop();
-			this.CreateDesktop = () => manager.DesktopManager.CreateDesktop();
-			this.RemoveDesktop = () => manager.DesktopManager.RemoveDesktop();
+			this.GotoPreviousDesktop = manager.DesktopManager.GotoPreviousDesktop;
+			this.CreateDesktop = manager.DesktopManager.CreateDesktop;
+			this.RemoveDesktop = manager.DesktopManager.RemoveDesktop;
 			this.ToggleLauncher = toggleLauncherUi ?? (() => { });
 			this.Die = exit ?? (() => { });
 

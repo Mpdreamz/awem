@@ -7,9 +7,10 @@
 
     <ItemGroup>
       <!--<PackageReference Include="VirtualDesktop" Version="3.0.0-beta1" />-->
+      <PackageReference Include="DynamicData" Version="6.7.1.2534" />
       <PackageReference Include="Microsoft.Win32.SystemEvents" Version="4.5.0" />
       <PackageReference Include="System.Drawing.Common" Version="4.5.0" />
-      <PackageReference Include="reactiveui" Version="8.7.2" />
+      <PackageReference Include="reactiveui" Version="9.8.15" />
       <ProjectReference Include="..\..\..\VirtualDesktop\source\VirtualDesktop\VirtualDesktop.csproj" />
 
     </ItemGroup>
